@@ -1,11 +1,14 @@
 package com.mycoursework.tasker.configs.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mycoursework.tasker.configs.Constants;
+import com.mycoursework.tasker.entities.AppUser;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -14,6 +17,8 @@ import io.jsonwebtoken.Jwts;
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.stream.Collectors;
 
@@ -28,12 +33,23 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     }
 
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
-        var username = request.getParameter("username");
-        var password = request.getParameter("password");
-        var authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+        try{
+            AppUser creds = new ObjectMapper().readValue(request.getInputStream(), AppUser.class);
+            return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    creds.getUsername(),
+                    creds.getPassword(),
+                    new ArrayList<>())
+            );
+        }catch (IOException e){
+            throw new RuntimeException(e);
+        }
 
-        return authenticationManager.authenticate(authenticationToken);
+        //var username = request.getParameter("username");
+        //var password = request.getParameter("password");
+        //var authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+
+        //return authenticationManager.authenticate(authenticationToken);
     }
 
     @Override
