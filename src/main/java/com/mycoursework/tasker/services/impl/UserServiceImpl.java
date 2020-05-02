@@ -6,6 +6,7 @@ import com.mycoursework.tasker.entities.User;
 import com.mycoursework.tasker.exceptions.ValidationException;
 import com.mycoursework.tasker.services.UserService;
 import com.mycoursework.tasker.web.dto.UserSignUp;
+import com.mycoursework.tasker.web.dto.UserToUpdate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -83,8 +84,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void update(User user) {
-        throw new UnsupportedOperationException();
+    public void update(UserToUpdate user, String id) {
+        try{
+            user.setPassword(bcryptPasswordEncoder.encode(user.getPassword()));
+            userDao.update(user,id);
+        }catch (Exception e){
+            System.err.println(e.getMessage());
+        }
     }
 
     @Override

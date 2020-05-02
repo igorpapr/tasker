@@ -2,6 +2,7 @@ package com.mycoursework.tasker.services;
 
 import com.mycoursework.tasker.entities.User;
 import com.mycoursework.tasker.web.dto.UserSignUp;
+import com.mycoursework.tasker.web.dto.UserToUpdate;
 
 import javax.validation.ValidationException;
 import java.util.List;
@@ -21,7 +22,7 @@ public interface UserService {
 
     void deleteById(String id);
 
-    void update(User user);
+    void update(UserToUpdate user, String id);
 
     void checkCorrectPassword(User user, String password);
 }

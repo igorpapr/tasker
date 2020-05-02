@@ -1,8 +1,10 @@
 package com.mycoursework.tasker.web.сontrollers;
 
 import com.mycoursework.tasker.configs.Constants;
+import com.mycoursework.tasker.configs.security.facade.IAuthenticationFacade;
 import com.mycoursework.tasker.services.UserService;
 import com.mycoursework.tasker.web.dto.UserProfile;
+import com.mycoursework.tasker.web.dto.UserToUpdate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +18,12 @@ import java.util.List;
 public class UsersController {
 
 	UserService userService;
+	IAuthenticationFacade authenticationFacade;
 
 	@Autowired
-	public UsersController(UserService userService) {
+	public UsersController(UserService userService, IAuthenticationFacade authenticationFacade) {
 		this.userService = userService;
+		this.authenticationFacade = authenticationFacade;
 	}
 
 	@GetMapping
@@ -34,6 +38,9 @@ public class UsersController {
 		return new ResponseEntity<>(res, HttpStatus.OK);
 	}
 
-
-
+	@PutMapping
+	public ResponseEntity<?> updateUser(@RequestBody UserToUpdate userToUpdate){
+		userService.update(userToUpdate, authenticationFacade.getUserId());
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 }
