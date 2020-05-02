@@ -1,48 +1,86 @@
 package com.mycoursework.tasker.configs.security;
 
+import com.mycoursework.tasker.configs.Constants;
+import com.mycoursework.tasker.services.impl.UserDetailsServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+@Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
+    private final JwtAuthenticationEntryPoint unauthorizedHandler;
+    private final UserDetailsServiceImpl jwtUserDetailsService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public SecurityConfiguration(JwtAuthenticationEntryPoint unauthorizedHandler,
+                                 UserDetailsServiceImpl jwtUserDetailsService, JwtTokenProvider jwtTokenProvider, PasswordEncoder passwordEncoder) {
+        this.unauthorizedHandler = unauthorizedHandler;
+        this.jwtUserDetailsService = jwtUserDetailsService;
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    public void configure(WebSecurity webSecurity) {
+        webSecurity
+                .ignoring()
+                .antMatchers(
+                        Constants.AUTH_URLS
+                        //Constants.SECUR_ACTIVATION_URLS,
+                        //Constants.SECUR_RECOVER_URLS,
+                );
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.cors().and()
-                .csrf().disable()
-                .authorizeRequests()
-                .antMatchers("/api/public").permitAll()
-                .anyRequest().authenticated()
+        http
+                .httpBasic().disable()// off httpBasic
+                .csrf().disable()     // off csrf
+                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)// add Exception Handler
                 .and()
-                .addFilter(new JwtAuthenticationFilter(authenticationManager()))
-                .addFilter(new JwtAuthorizationFilter(authenticationManager()))
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // without session
+                .and()
+                .authorizeRequests().requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                .anyRequest().authenticated()//other URLS - only having token provided
+                .and()
+                .anonymous()
+                .and()
+                .cors()
+                .and()
+                .apply(new JwtConfigurer(jwtTokenProvider));
     }
+
 
     @Override
-    public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        //auth.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder());
-        auth.inMemoryAuthentication()
-                .withUser("user")
-                .password(passwordEncoder().encode("password"))
-                .authorities("ROLE_USER");
+    public void configure(AuthenticationManagerBuilder authManagerBuilder) throws Exception {
+        authManagerBuilder
+                .userDetailsService(jwtUserDetailsService)
+                .passwordEncoder(passwordEncoder);
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    @Bean(BeanIds.AUTHENTICATION_MANAGER)
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
     }
 
     @Bean

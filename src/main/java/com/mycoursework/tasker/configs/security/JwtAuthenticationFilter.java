@@ -1,79 +1,51 @@
 package com.mycoursework.tasker.configs.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mycoursework.tasker.configs.Constants;
-import com.mycoursework.tasker.entities.AppUser;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import io.jsonwebtoken.Jwts;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.util.StringUtils;
+import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.stream.Collectors;
 
-public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+@Slf4j
+public class JwtAuthenticationFilter extends GenericFilterBean {
 
-    private final AuthenticationManager authenticationManager;
+    final private JwtTokenProvider tokenProvider;
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
-
-        setFilterProcessesUrl(Constants.AUTH_LOGIN_URL);
+    public JwtAuthenticationFilter(JwtTokenProvider tokenProvider) {
+        this.tokenProvider = tokenProvider;
     }
 
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        try{
-            AppUser creds = new ObjectMapper().readValue(request.getInputStream(), AppUser.class);
-            return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                    creds.getUsername(),
-                    creds.getPassword(),
-                    new ArrayList<>())
-            );
-        }catch (IOException e){
-            throw new RuntimeException(e);
+    public void doFilter(ServletRequest servletRequest,
+                         ServletResponse servletResponse,
+                         FilterChain filterChain) throws IOException, ServletException {
+        try {
+            String jwtToken = tokenProvider.resolveToken((HttpServletRequest) servletRequest);
+            if (StringUtils.hasText(jwtToken) && tokenProvider.validateToken(jwtToken)) {
+                String jwtUsername = tokenProvider.getUsernameFromJwt(jwtToken);
+                if (StringUtils.isEmpty(jwtUsername)) {
+                    throw new UsernameNotFoundException("Username wasn't found inside of the token");
+                }
+                Authentication authentication = tokenProvider.getAuthentication(jwtToken);
+                if (authentication != null) {
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            }
+        } catch (Exception ex) {
+            log.info("Couldn't set user authentication in security context", ex);
         }
-
-        //var username = request.getParameter("username");
-        //var password = request.getParameter("password");
-        //var authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
-
-        //return authenticationManager.authenticate(authenticationToken);
+        filterChain.doFilter(servletRequest, servletResponse);
     }
 
-    @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
-                                            FilterChain filterChain, Authentication authentication) {
-        var user = ((User) authentication.getPrincipal());
 
-        var roles = user.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
 
-        var signingKey = Constants.JWT_SECRET.getBytes();
 
-        var token = Jwts.builder()
-                .signWith(Keys.hmacShaKeyFor(signingKey), SignatureAlgorithm.HS512)
-                .setHeaderParam("typ", Constants.TOKEN_TYPE)
-                .setIssuer(Constants.TOKEN_ISSUER)
-                .setAudience(Constants.TOKEN_AUDIENCE)
-                .setSubject(user.getUsername())
-                .setExpiration(new Date(System.currentTimeMillis() + 864000000))
-                .claim("rol", roles)
-                .compact();
-
-        response.addHeader(Constants.TOKEN_HEADER, Constants.TOKEN_PREFIX + token);
-    }
 }
