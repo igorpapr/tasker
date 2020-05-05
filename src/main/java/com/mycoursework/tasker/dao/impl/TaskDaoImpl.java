@@ -17,15 +17,10 @@ import java.util.List;
 @Repository
 public class TaskDaoImpl implements TaskDao {
 
-	private String SELECT_QUERY = "SELECT task_id, title, description, deadline, completed, is_public " +
+	private String SELECT_QUERY = "SELECT task_id, title, description " +
 								  "FROM tasks ";
-	private String INSERT_QUERY = "INSERT INTO tasks (task_id, title, description, deadline, completed, user_id, is_public) " +
-									"VALUES (?, ?, ?, ?, ?, ?, ?)";
-	private String UPDATE_QUERY = "UPDATE tasks" +
-									"SET title = ?, description = ?, deadline = ?, completed = ?, is_public = ? ";
-
-	private String DELETE_QUERY = "DELETE FROM tasks " +
-									"WHERE task_id = ? ;";
+	private String INSERT_QUERY = "INSERT INTO tasks (task_id, title, description, user_id) " +
+									"VALUES (?, ?, ?, ?)";
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -59,37 +54,12 @@ public class TaskDaoImpl implements TaskDao {
 	}
 
 	@Override
-	public void updateTask(Task newTask) {
-		try{
-			jdbcTemplate.update( UPDATE_QUERY +
-									"WHERE task_id = ? ;",
-					newTask.getTitle(), newTask.getDescription(), newTask.getDeadline(), newTask.isCompleted(),
-					newTask.isPublic(), newTask.getTaskId());
-		} catch (EmptyResultDataAccessException exception) {
-			throw new EmptyResultException("Task wasn't found with such id: " + newTask.getTaskId());
-		}catch (Exception e){
-			throw new DbException(e.getMessage());
-		}
-	}
-
-	@Override
-	public void deleteById(String id) {
-		try{
-			jdbcTemplate.update(DELETE_QUERY, id);
-		}catch (Exception e){
-			throw new DbException(e.getMessage());
-		}
-
-	}
-
-	@Override
 	public void addTask(String userId, Task task) {
 		try{
 			jdbcTemplate.update(INSERT_QUERY,
 					task.getTaskId(),
-					task.getTitle(), task.getDescription(), task.getDeadline(), task.isCompleted(),
-					userId,
-					task.isPublic());
+					task.getTitle(), task.getDescription(),
+					userId);
 		}catch (DuplicateKeyException e){
 			throw new DuplicateKeyWrapperException(e.getMessage());
 		}catch (Exception e1){

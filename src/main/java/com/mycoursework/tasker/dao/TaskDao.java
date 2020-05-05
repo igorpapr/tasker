@@ -9,9 +9,5 @@ public interface TaskDao {
 
 	List<Task> getTasksByUserId(String id);
 
-	void updateTask(Task newTask);
-
-	void deleteById(String id);
-
 	void addTask(String userId, Task task);
 }

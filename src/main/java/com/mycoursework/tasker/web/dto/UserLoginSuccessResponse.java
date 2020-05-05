@@ -2,11 +2,7 @@ package com.mycoursework.tasker.web.dto;
 
 import com.mycoursework.tasker.entities.Role;
 import com.mycoursework.tasker.entities.User;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 
@@ -15,32 +11,33 @@ import java.util.Date;
 @Getter
 @Setter
 @Builder
+@ToString
 public class UserLoginSuccessResponse{
 
-    private boolean success;
+    //private boolean success;
 
     private String token;
 
-    private String id;
+    //private String id;
 
-    private String email;
+    //private String email;
 
-    private String username;
+    //private String username;
 
-    private Date creationDate;
+    //private Date creationDate;
 
-    private String image;
+    //private String image;
 
-    private Role role;
+    //private Role role;
 
     public static UserLoginSuccessResponse fromUser(User user) {
-        return UserLoginSuccessResponse.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .creationDate(user.getCreationDate())
+        return UserLoginSuccessResponse.builder().build();
+                //.id(user.getId())
+                //.email(user.getEmail())
+                //.username(user.getUsername())
+                //.creationDate(user.getCreationDate())
                 //.image(user.getImage())
-                .role(user.getRole()).build();
+                //.role(user.getRole()).build();
     }
 
 }

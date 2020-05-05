@@ -13,9 +13,6 @@ public class TaskRowMapper implements RowMapper<Task> {
 		return new Task(
 				resultSet.getString("task_id"),
 				resultSet.getString("title"),
-				resultSet.getString("description"),
-				resultSet.getDate("deadline"),
-				resultSet.getBoolean("completed"),
-				resultSet.getBoolean("is_public"));
+				resultSet.getString("description"));
 	}
 }

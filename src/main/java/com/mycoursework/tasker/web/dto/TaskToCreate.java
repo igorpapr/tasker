@@ -5,15 +5,12 @@ import lombok.*;
 
 import java.util.Date;
 
-@ToString
 @Getter
 @Setter
 @EqualsAndHashCode
 @AllArgsConstructor
+@ToString
 public class TaskToCreate {
 	private String title;
 	private String description;
-	private Date deadline;
-	private boolean isCompleted;
-	private boolean isPublic;
 }

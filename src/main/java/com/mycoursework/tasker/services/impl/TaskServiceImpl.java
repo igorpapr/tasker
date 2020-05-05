@@ -34,7 +34,9 @@ public class TaskServiceImpl implements TaskService {
 
 	@Override
 	public List<Task> getTasksByUserId(String id) {
-		return taskDao.getTasksByUserId(id);
+		List<Task> res = taskDao.getTasksByUserId(id);
+		System.out.println(res);
+		return res;
 	}
 
 	@Override
@@ -51,10 +53,7 @@ public class TaskServiceImpl implements TaskService {
 		Task toBeInserted = new Task(
 				UUID.randomUUID().toString(),
 				task.getTitle(),
-				task.getDescription(),
-				task.getDeadline(),
-				task.isCompleted(),
-				task.isPublic()
+				task.getDescription()
 		);
 		try{
 			taskDao.addTask(userId,toBeInserted);

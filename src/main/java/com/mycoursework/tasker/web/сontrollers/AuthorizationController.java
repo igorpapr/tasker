@@ -32,14 +32,14 @@ public class AuthorizationController {
 
     @PostMapping("login")
     public ResponseEntity<UserLoginSuccessResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
-
+        System.out.println(loginRequest.toString());
         User currentUser = userService.getByUsername(loginRequest.getUsername());
 
         userService.checkCorrectPassword(currentUser, loginRequest.getPassword());
         UserLoginSuccessResponse successResponse = UserLoginSuccessResponse.fromUser(currentUser);
         successResponse.setToken(verificationService.isUserVerified(currentUser));
-        successResponse.setSuccess(true);
-
+        //successResponse.setSuccess(true);
+        System.out.println(successResponse);
         return new ResponseEntity<>(successResponse, HttpStatus.OK);
     }
 
