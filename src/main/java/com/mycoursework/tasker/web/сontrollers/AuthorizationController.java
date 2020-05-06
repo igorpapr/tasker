@@ -33,6 +33,8 @@ public class AuthorizationController {
     @PostMapping("login")
     public ResponseEntity<UserLoginSuccessResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
         System.out.println(loginRequest.toString());
+        
+        
         User currentUser = userService.getByUsername(loginRequest.getUsername());
 
         userService.checkCorrectPassword(currentUser, loginRequest.getPassword());
