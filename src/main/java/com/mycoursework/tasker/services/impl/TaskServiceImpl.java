@@ -21,31 +21,10 @@ public class TaskServiceImpl implements TaskService {
 	}
 
 	@Override
-	public Task getByTaskId(String id) {
-		Task task = null;
-		try{
-			task = taskDao.getByTaskId(id);
-		} catch(Exception e){
-			System.err.println(e.getMessage());
-			throw e;
-		}
-		return task;
-	}
-
-	@Override
 	public List<Task> getTasksByUserId(String id) {
 		List<Task> res = taskDao.getTasksByUserId(id);
 		System.out.println(res);
 		return res;
-	}
-
-	@Override
-	public void updateTask(Task newTask) {
-	}
-
-	@Override
-	public void deleteById(String id) {
-
 	}
 
 	@Override

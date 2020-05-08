@@ -6,12 +6,11 @@ import com.mycoursework.tasker.entities.User;
 import com.mycoursework.tasker.exceptions.ValidationException;
 import com.mycoursework.tasker.services.UserService;
 import com.mycoursework.tasker.web.dto.UserSignUp;
-import com.mycoursework.tasker.web.dto.UserToUpdate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.util.Calendar;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -32,11 +31,7 @@ public class UserServiceImpl implements UserService {
                                  newUser.getEmail(),
                                 bcryptPasswordEncoder.encode(newUser.getPassword()),
                                 newUser.getUsername(),
-                                Calendar.getInstance().getTime(),
-                                bcryptPasswordEncoder.encode(newUser.getEmail() + newUser.getUsername()),
-                                true,
                                 Role.ROLE_USER);
-//        //TODO - send message with accept code
         try{
             userDao.insertUser(toInsert);
         }
@@ -44,16 +39,6 @@ public class UserServiceImpl implements UserService {
             System.err.println(e.getMessage());
             throw e;
         }
-    }
-
-    @Override
-    public User getById(String id) {
-        return null;
-    }
-
-    @Override
-    public User getByActivationUrl(String activationUrl) {
-        return null;
     }
 
     @Override
@@ -66,31 +51,6 @@ public class UserServiceImpl implements UserService {
             throw e;
         }
         return user;
-    }
-
-    @Override
-    public List<User> getAllUsers() {
-        return userDao.getAllUsers();
-    }
-
-    @Override
-    public User getByEmail(String email) {
-        return null;
-    }
-
-    @Override
-    public void deleteById(String id) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void update(UserToUpdate user, String id) {
-        try{
-            user.setPassword(bcryptPasswordEncoder.encode(user.getPassword()));
-            userDao.update(user,id);
-        }catch (Exception e){
-            System.err.println(e.getMessage());
-        }
     }
 
     @Override

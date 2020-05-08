@@ -30,19 +30,6 @@ public class TaskDaoImpl implements TaskDao {
 	}
 
 	@Override
-	public Task getByTaskId(String id) {
-		try{
-			return jdbcTemplate.queryForObject( SELECT_QUERY +
-												"WHERE task_id = ? ;",
-					new Object[]{id}, new TaskRowMapper());
-		} catch (EmptyResultDataAccessException exception){
-			throw new EmptyResultException("Task wasn't found with such id: " + id);
-		} catch (Exception e){
-			throw new DbException(e.getMessage());
-		}
-	}
-
-	@Override
 	public List<Task> getTasksByUserId(String id) {
 		try{
 			return jdbcTemplate.query( SELECT_QUERY +

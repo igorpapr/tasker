@@ -44,23 +44,21 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .ignoring()
                 .antMatchers(
                         Constants.AUTH_URLS
-                        //Constants.SECUR_ACTIVATION_URLS,
-                        //Constants.SECUR_RECOVER_URLS,
                 );
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .httpBasic().disable()// off httpBasic
-                .csrf().disable()     // off csrf
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)// add Exception Handler
+                .httpBasic().disable()
+                .csrf().disable()
+                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
                 .and()
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // without session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests().requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                .anyRequest().authenticated()//other URLS - only having token provided
+                .anyRequest().authenticated()
                 .and()
                 .anonymous()
                 .and()

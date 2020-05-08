@@ -7,13 +7,7 @@ import java.util.List;
 
 public interface TaskService {
 
-	Task getByTaskId(String id);
-
 	List<Task> getTasksByUserId(String id);
-
-	void updateTask(Task newTask);
-
-	void deleteById(String id);
 
 	void addTask(String userId, TaskToCreate task);
 }

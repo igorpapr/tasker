@@ -5,7 +5,6 @@ import com.mycoursework.tasker.configs.security.facade.IAuthenticationFacade;
 import com.mycoursework.tasker.entities.Task;
 import com.mycoursework.tasker.services.TaskService;
 import com.mycoursework.tasker.web.dto.TaskToCreate;
-import com.mycoursework.tasker.web.dto.UserProfile;
 import com.mycoursework.tasker.web.validation.TaskValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

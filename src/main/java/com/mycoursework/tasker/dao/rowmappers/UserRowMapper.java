@@ -16,9 +16,6 @@ public class UserRowMapper implements RowMapper<User> {
             resultSet.getString("email"),
                 resultSet.getString("password"),
                 resultSet.getString("username"),
-                resultSet.getDate("creation_date"),
-                resultSet.getString("activation_url"),
-                resultSet.getBoolean("is_activated"),
                 Role.valueOf(resultSet.getString("role")));
     }
 }

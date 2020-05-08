@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 
 @RestController
@@ -34,13 +33,11 @@ public class AuthorizationController {
     public ResponseEntity<UserLoginSuccessResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
         System.out.println(loginRequest.toString());
         
-        
         User currentUser = userService.getByUsername(loginRequest.getUsername());
 
         userService.checkCorrectPassword(currentUser, loginRequest.getPassword());
         UserLoginSuccessResponse successResponse = UserLoginSuccessResponse.fromUser(currentUser);
         successResponse.setToken(verificationService.isUserVerified(currentUser));
-        //successResponse.setSuccess(true);
         System.out.println(successResponse);
         return new ResponseEntity<>(successResponse, HttpStatus.OK);
     }
@@ -49,10 +46,7 @@ public class AuthorizationController {
     public ResponseEntity<?> register(@RequestBody UserSignUp signUpUser) throws ValidationException{
 
         SignUpRequestValidator.validate(signUpUser);
-
         userService.insertUser(signUpUser);
-
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
 }
