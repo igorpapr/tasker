@@ -14,17 +14,11 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class UserDaoImpl implements UserDao {
-
-    private JdbcTemplate jdbcTemplate;
-
+    private final JdbcTemplate jdbcTemplate;
     private final String SELECT_QUERY = "SELECT id, email, password, username, role " +
             "FROM users ";
-
-
     private final String INSERT_QUERY_SINGLE = "INSERT INTO users (id, email, password, username, role) " +
             "VALUES (?, ?, ?, ?, ?);";
-
-
     @Autowired
     public UserDaoImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -56,5 +50,4 @@ public class UserDaoImpl implements UserDao {
             throw new DbException(e1.getMessage());
         }
     }
-
 }

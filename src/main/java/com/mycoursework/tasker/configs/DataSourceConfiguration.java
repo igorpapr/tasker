@@ -8,23 +8,14 @@ import javax.sql.DataSource;
 
 @Configuration
 public class DataSourceConfiguration {
-//    @Bean
-//    public DataSource dataSource() {
-//        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-//        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-//        dataSource.setUrl("jdbc:mysql://localhost:3306/taskerdb?&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&rewriteBatchedStatements=true");
-//        dataSource.setUsername("root");
-//        dataSource.setPassword("admin");
-//        return dataSource;
-//    }
 
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql://ec2-46-137-156-205.eu-west-1.compute.amazonaws.com:5432/dar8qogfcohdrf");
-        dataSource.setUsername("dbyxlbwkgndjez");
-        dataSource.setPassword("df10ad043b3bcd88ae3e21f7754136dff5c1a7c34588acbda9ac307a8fe20cd9");
+        dataSource.setUrl("jdbc:postgresql://ec2-54-228-209-117.eu-west-1.compute.amazonaws.com:5432/d6dfo4fdpmc115");
+        dataSource.setUsername("gmtbmuwhvbiiun");
+        dataSource.setPassword("4dc59e4be2d89b404717e898ed8422963c0bd751116746b969484fbf7badf7fd");
         return dataSource;
     }
 }
